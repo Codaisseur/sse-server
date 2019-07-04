@@ -1,5 +1,5 @@
 const express = require('express')
-const SSE = require('express-sse')
+const SSE = require('json-sse')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
