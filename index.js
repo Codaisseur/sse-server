@@ -25,9 +25,9 @@ function onMessage (request, response) {
   const { message } = request.body
 
   messages.push(message)
-  stream.send(messages)
-
   const json = JSON.stringify(messages)
+  stream.send(json)
+
   stream.updateInit(json)
 
   return response.send(message)
