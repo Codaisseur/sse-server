@@ -2,6 +2,8 @@ const express = require('express')
 const SSE = require('json-sse')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const streamFactory = require('./streamFactory')
+const messageFactory = require('./messageFactory')
 
 const app = express()
 app.use(cors())
@@ -9,30 +11,28 @@ app.use(cors())
 const jsonParser = bodyParser.json()
 app.use(jsonParser)
 
-const messages = [
-  'hello',
-  'Can you see this?'
-]
-const json = JSON.stringify(messages)
-const stream = new SSE(json)
+const stream = new SSE()
 
-function onStream (request, response) {
-  stream.init(request, response)
-}
-app.get('/stream', onStream)
+// app.get('/stream', (request, response) => {
+//   stream.init(request, response)
+// })
+const streamRouter = streamFactory(stream)
+app.use(streamRouter)
 
-function onMessage (request, response) {
-  const { message } = request.body
-
-  messages.push(message)
-  const json = JSON.stringify(messages)
-  stream.send(json)
-
-  stream.updateInit(json)
-
-  return response.send(message)
-}
-app.post('/message', onMessage)
+// app.post('/message', (request, response) => {
+//   const { message } = request.body
+//
+//   messages.push(message)
+//   const json = JSON.stringify(messages)
+//   stream.send(json)
+//
+//   stream.updateInit(json)
+//
+//   return response.send(message)
+// })
+//
+const messageRouter = messageFactory(stream)
+app.use(messageRouter)
 
 const port = process.env.PORT || 5000
 function onListen () {
